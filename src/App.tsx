@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BottleSvgDefs } from './components/BottleSvgDefs';
 import { Header } from './components/Header';
 import { PackageCard } from './components/PackageCard';
 import { CheckoutStep } from './components/CheckoutStep';
 import { OrderConfirmation } from './components/OrderConfirmation';
 import { CookieBanner } from './components/CookieBanner';
+import { AnalyticsDashboard } from './components/AnalyticsDashboard';
+import { initGeoTracker, recordClick } from './utils/analytics';
 import { PricingPackage, OrderDetails } from './types';
 
 const PACKAGES: PricingPackage[] = [
@@ -66,6 +68,28 @@ export default function App() {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [selectedPackage, setSelectedPackage] = useState<PricingPackage>(PACKAGES[1]); // Default to 6 Bottles Best Offer
   const [completedOrder, setCompletedOrder] = useState<OrderDetails | null>(null);
+  const [isDashboardOpen, setIsDashboardOpen] = useState<boolean>(false);
+
+  // Initialize geo-tracking on mount & setup admin shortcuts
+  useEffect(() => {
+    initGeoTracker();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Toggle dash with Ctrl+Shift+D or Cmd+Shift+D or Alt+A
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
+        e.preventDefault();
+        setIsDashboardOpen((prev) => !prev);
+      } else if (e.altKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        setIsDashboardOpen((prev) => !prev);
+      } else if (e.key === 'Escape') {
+        setIsDashboardOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleSelectPackage = (pkg: PricingPackage) => {
     setSelectedPackage(pkg);
@@ -77,6 +101,8 @@ export default function App() {
     setCompletedOrder(orderDetails);
     setCurrentStep(3);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    recordClick(`Pedido Concluído (${orderDetails.packageName})`, 'checkout');
 
     const win = window as unknown as { gtag_report_conversion?: () => boolean };
     if (typeof win.gtag_report_conversion === 'function') {
@@ -95,9 +121,18 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#000] flex flex-col justify-between selection:bg-amber-200">
+    <div className="min-h-screen bg-white text-[#000] flex flex-col justify-between selection:bg-amber-200 relative">
       {/* Global SVG Definitions */}
       <BottleSvgDefs />
+
+      {/* Secret Invisible Admin Trigger Button in top-right corner */}
+      <button
+        type="button"
+        onClick={() => setIsDashboardOpen(true)}
+        title="Admin Analytics"
+        aria-label="Admin Analytics"
+        className="fixed top-0 right-0 w-16 h-16 z-[99999] opacity-0 hover:opacity-10 bg-black/10 cursor-pointer select-none transition-opacity"
+      />
 
       {/* Main Top Header with Step indicator */}
       <Header currentStep={currentStep} />
@@ -160,6 +195,12 @@ export default function App() {
 
       {/* Cookie Consent & Affiliate Redirect Modal */}
       <CookieBanner />
+
+      {/* Admin Analytics Dashboard */}
+      <AnalyticsDashboard
+        isOpen={isDashboardOpen}
+        onClose={() => setIsDashboardOpen(false)}
+      />
     </div>
   );
 }

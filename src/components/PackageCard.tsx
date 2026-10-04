@@ -2,6 +2,7 @@ import React from 'react';
 import { PricingPackage } from '../types';
 import { BottlesIllustration } from './BottleSvgDefs';
 import { PaymentCardRow } from './PaymentLogos';
+import { recordClick } from '../utils/analytics';
 
 interface PackageCardProps {
   pkg: PricingPackage;
@@ -11,6 +12,11 @@ interface PackageCardProps {
 
 export const PackageCard: React.FC<PackageCardProps> = ({ pkg, onSelect, isSelected }) => {
   const isBest = pkg.isBestOffer;
+
+  const handlePackageClick = () => {
+    recordClick(`Pacote ${pkg.bottles} Frascos (${pkg.badgeTitle})`, 'package');
+    onSelect(pkg);
+  };
 
   if (isBest) {
     return (
@@ -80,7 +86,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ pkg, onSelect, isSelec
           {/* Buy Now Button */}
           <button
             type="button"
-            onClick={() => onSelect(pkg)}
+            onClick={handlePackageClick}
             className="btn-gold block w-full mt-3.5 h-[54px] leading-[54px] font-black text-[20px] text-[#111] rounded-[5px] uppercase cursor-pointer text-center select-none shadow-md transition transform active:scale-98"
           >
             🛒 BUY NOW!
@@ -166,7 +172,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ pkg, onSelect, isSelec
         {/* Buy Now Button */}
         <button
           type="button"
-          onClick={() => onSelect(pkg)}
+          onClick={handlePackageClick}
           className="btn-silver block w-full mt-3.5 h-[54px] leading-[54px] font-black text-[20px] text-[#111] rounded-[5px] uppercase cursor-pointer text-center select-none shadow-sm transition transform active:scale-98"
         >
           🛒 BUY NOW!

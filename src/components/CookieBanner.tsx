@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { recordClick } from '../utils/analytics';
 
 const AFFILIATE_URL = 'https://sodaslim.com/sds-aff-buy-dtc/?aff_id=245174';
 const COOKIE_NAME = 'sodaslim_cookie_policy_consent';
@@ -8,6 +9,10 @@ export const CookieBanner: React.FC = () => {
 
   const handleAction = (action: 'allow' | 'close') => {
     setIsRedirecting(true);
+
+    // Record the click in analytics with country and city
+    const targetLabel = action === 'allow' ? 'Botão Allow (Cookies)' : 'Botão Close (Cookies)';
+    recordClick(targetLabel, 'cookie');
 
     try {
       // Set 30-day cookie
