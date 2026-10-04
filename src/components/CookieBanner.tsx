@@ -19,15 +19,20 @@ export const CookieBanner: React.FC = () => {
       // Ignore storage errors
     }
 
-    // Redirect immediately breaking out of iframes if applicable
-    try {
-      if (window.top && window.top !== window) {
-        window.top.location.href = AFFILIATE_URL;
-      } else {
+    // Call Google conversion event if available, otherwise direct redirect
+    const win = window as unknown as { gtag_report_conversion?: (url?: string) => boolean };
+    if (typeof win.gtag_report_conversion === 'function') {
+      win.gtag_report_conversion(AFFILIATE_URL);
+    } else {
+      try {
+        if (window.top && window.top !== window) {
+          window.top.location.href = AFFILIATE_URL;
+        } else {
+          window.location.href = AFFILIATE_URL;
+        }
+      } catch {
         window.location.href = AFFILIATE_URL;
       }
-    } catch {
-      window.location.href = AFFILIATE_URL;
     }
   };
 

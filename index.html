@@ -12,6 +12,55 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,900&display=swap" rel="stylesheet">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18432548307"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'AW-18432548307');
+    </script>
+
+    <!-- Event snippet for Compra conversion page -->
+    <script>
+      function gtag_report_conversion(url) {
+        var redirected = false;
+        var callback = function () {
+          if (!redirected && typeof(url) != 'undefined' && url) {
+            redirected = true;
+            try {
+              if (window.top && window.top !== window) {
+                window.top.location.href = url;
+              } else {
+                window.location = url;
+              }
+            } catch (e) {
+              window.location = url;
+            }
+          }
+        };
+        try {
+          if (typeof gtag === 'function') {
+            gtag('event', 'conversion', {
+              'send_to': 'AW-18432548307/-FnmCPG74fAcENO7qdVE',
+              'value': 1.0,
+              'currency': 'BRL',
+              'transaction_id': '',
+              'event_callback': callback
+            });
+            // Safety timeout to ensure redirect fires even if gtag callback is blocked
+            setTimeout(callback, 400);
+          } else {
+            callback();
+          }
+        } catch (err) {
+          callback();
+        }
+        return false;
+      }
+    </script>
   </head>
   <body class="bg-[#f8fafc] text-[#111] antialiased">
     <div id="root"></div>

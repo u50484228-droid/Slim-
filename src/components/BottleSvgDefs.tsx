@@ -4,7 +4,7 @@ import twoBottlesImg from '../assets/images/sodaslim_two_bottles_1791075788952.j
 import threeBottlesImg from '../assets/images/sodaslim_three_bottles_1791075809285.jpg';
 import sixBottlesImg from '../assets/images/sodaslim_six_bottles_1791075798293.jpg';
 
-// Bundled realistic bottle image assets
+// Exact original high-definition SodaSlim bottle assets requested by user
 export const BOTTLE_IMAGES = {
   single: singleBottleImg,
   two: twoBottlesImg,
@@ -18,7 +18,7 @@ export const BottleSvgDefs: React.FC = () => {
 
 export const BottlesIllustration: React.FC<{ bottles: number; className?: string }> = ({
   bottles,
-  className = 'max-h-[220px] max-w-[240px] object-contain drop-shadow-md transition-transform duration-300 hover:scale-105',
+  className = 'max-h-[235px] max-w-full object-contain',
 }) => {
   let imageSrc = BOTTLE_IMAGES.two;
   if (bottles === 6) imageSrc = BOTTLE_IMAGES.six;
@@ -30,7 +30,7 @@ export const BottlesIllustration: React.FC<{ bottles: number; className?: string
       src={imageSrc}
       alt={`SodaSlim ${bottles} Bottles Package`}
       loading="eager"
-      className={`rounded-lg ${className}`}
+      className={className}
     />
   );
 };

@@ -77,6 +77,15 @@ export default function App() {
     setCompletedOrder(orderDetails);
     setCurrentStep(3);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const win = window as unknown as { gtag_report_conversion?: () => boolean };
+    if (typeof win.gtag_report_conversion === 'function') {
+      try {
+        win.gtag_report_conversion();
+      } catch {
+        // Ignore tracking errors
+      }
+    }
   };
 
   const handleResetOrder = () => {
