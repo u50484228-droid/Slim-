@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Nunito', Arial, sans-serif;
+    color: #000;
+  }
+}
+
+/* Original Sales page gradients and styling utilities */
+.bg-header-gradient {
+  background: radial-gradient(ellipse at 50% 100%, #c26a1a 0%, #a35a14 45%, #7d430c 100%);
+}
+
+.bg-best-body-gradient {
+  background: radial-gradient(ellipse at 50% 30%, #d2780f 0%, #bb650c 55%, #a45508 100%);
+}
+
+.btn-silver {
+  background: linear-gradient(#d3d3d3 0 50%, #bdbdbd 50%);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-silver:hover {
+  background: linear-gradient(#dddddd 0 50%, #c5c5c5 50%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-silver:active {
+  transform: translateY(1px);
+}
+
+.btn-gold {
+  background: linear-gradient(#ffd200 0 50%, #f2c400 50%);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-gold:hover {
+  background: linear-gradient(#ffe033 0 50%, #f7cd05 50%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(255, 210, 0, 0.4);
+}
+
+.btn-gold:active {
+  transform: translateY(1px);
+}
+
+/* Pulse animation for best offer */
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.pulse-highlight {
+  animation: pulse-subtle 3.5s infinite ease-in-out;
+}
+
+@keyframes modalScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scaleUp {
+  animation: modalScale 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

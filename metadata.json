@@ -1,0 +1,6 @@
+{
+  "name": "SodaSlim Discount Package Selector",
+  "description": "Interactive discount package selection and checkout for SodaSlim with responsive pricing cards, step navigation, and secure ordering.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
