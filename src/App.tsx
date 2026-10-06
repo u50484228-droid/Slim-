@@ -5,14 +5,27 @@
 
 import React, { useState, useEffect } from 'react';
 import { BottleSvgDefs } from './components/BottleSvgDefs';
-import { Header } from './components/Header';
-import { PackageCard } from './components/PackageCard';
+import { TopNav } from './components/TopNav';
+import { HeroSection } from './components/HeroSection';
+import { VideoSection } from './components/VideoSection';
+import { IntroSection } from './components/IntroSection';
+import { IngredientsGrid } from './components/IngredientsGrid';
+import { BodyImpactSection } from './components/BodyImpactSection';
+import { DoctorAndLabSection } from './components/DoctorAndLabSection';
+import { JourneySection } from './components/JourneySection';
+import { TestimonialsSection } from './components/TestimonialsSection';
+import { ExploreOffersSection } from './components/ExploreOffersSection';
+import { GuaranteeCard } from './components/GuaranteeCard';
+import { ScientificReferencesSection } from './components/ScientificReferencesSection';
+import { FaqSection } from './components/FaqSection';
+import { SalesFooter } from './components/SalesFooter';
 import { CheckoutStep } from './components/CheckoutStep';
 import { OrderConfirmation } from './components/OrderConfirmation';
 import { CookieBanner } from './components/CookieBanner';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
-import { initGeoTracker, recordClick } from './utils/analytics';
+import { startVisitorSession, recordClick, registerCurrentAsAdmin } from './utils/analytics';
 import { PricingPackage, OrderDetails } from './types';
+import { ShoppingCart } from 'lucide-react';
 
 const PACKAGES: PricingPackage[] = [
   {
@@ -69,27 +82,63 @@ export default function App() {
   const [selectedPackage, setSelectedPackage] = useState<PricingPackage>(PACKAGES[1]); // Default to 6 Bottles Best Offer
   const [completedOrder, setCompletedOrder] = useState<OrderDetails | null>(null);
   const [isDashboardOpen, setIsDashboardOpen] = useState<boolean>(false);
+  const [showStickyBar, setShowStickyBar] = useState<boolean>(false);
 
-  // Initialize geo-tracking on mount & setup admin shortcuts
+  const openAdminDashboard = () => {
+    registerCurrentAsAdmin();
+    setIsDashboardOpen(true);
+  };
+
+  // Initialize session tracking on mount & setup admin shortcuts
   useEffect(() => {
-    initGeoTracker();
+    startVisitorSession();
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Toggle dash with Ctrl+Shift+D or Cmd+Shift+D or Alt+A
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
         e.preventDefault();
-        setIsDashboardOpen((prev) => !prev);
+        openAdminDashboard();
       } else if (e.altKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
-        setIsDashboardOpen((prev) => !prev);
+        openAdminDashboard();
       } else if (e.key === 'Escape') {
         setIsDashboardOpen(false);
       }
     };
 
+    const handleOpenCustom = () => {
+      openAdminDashboard();
+    };
+
+    const handleScroll = () => {
+      if (window.scrollY > 600) {
+        setShowStickyBar(true);
+      } else {
+        setShowStickyBar(false);
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('sodaslim_open_admin_dash', handleOpenCustom);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('sodaslim_open_admin_dash', handleOpenCustom);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
+
+  const scrollToSection = (id: string) => {
+    if (id === 'top') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    const elem = document.getElementById(id);
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const handleSelectPackage = (pkg: PricingPackage) => {
     setSelectedPackage(pkg);
@@ -102,7 +151,7 @@ export default function App() {
     setCurrentStep(3);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    recordClick(`Pedido Concluído (${orderDetails.packageName})`, 'checkout');
+    recordClick(`Completed Order (${orderDetails.packageName})`, 'checkout');
 
     const win = window as unknown as { gtag_report_conversion?: () => boolean };
     if (typeof win.gtag_report_conversion === 'function') {
@@ -121,55 +170,72 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#000] flex flex-col justify-between selection:bg-amber-200 relative">
+    <div className="min-h-screen bg-white text-[#000] flex flex-col justify-between selection:bg-amber-200 relative font-sans">
       {/* Global SVG Definitions */}
       <BottleSvgDefs />
 
       {/* Secret Invisible Admin Trigger Button in top-right corner */}
       <button
         type="button"
-        onClick={() => setIsDashboardOpen(true)}
-        title="Admin Analytics"
-        aria-label="Admin Analytics"
-        className="fixed top-0 right-0 w-16 h-16 z-[99999] opacity-0 hover:opacity-10 bg-black/10 cursor-pointer select-none transition-opacity"
+        onClick={openAdminDashboard}
+        title="Admin Analytics (Top Right)"
+        aria-label="Admin Analytics Top"
+        className="fixed top-0 right-0 w-14 h-14 sm:w-20 sm:h-20 z-[99999] opacity-0 hover:opacity-5 bg-black/5 cursor-default select-none transition-opacity"
       />
 
-      {/* Main Top Header with Step indicator */}
-      <Header currentStep={currentStep} />
+      {/* Secret Invisible Admin Trigger Button in bottom-right corner (Final da página lado direito) */}
+      <button
+        type="button"
+        onClick={openAdminDashboard}
+        title="Admin Analytics (Bottom Right)"
+        aria-label="Admin Analytics Bottom"
+        className="fixed bottom-0 right-0 w-14 h-14 sm:w-20 sm:h-20 z-[99999] opacity-0 hover:opacity-5 bg-black/5 cursor-default select-none transition-opacity"
+      />
+
+      {/* Main Top Header Navigation (Matching Image 1) */}
+      <TopNav onScrollTo={scrollToSection} />
 
       {/* Step Views */}
       <main className="flex-1">
         {currentStep === 1 && (
           <div className="animate-fadeIn">
-            {/* Package Selection Container with Only the Bottles */}
-            <div className="flex flex-col lg:flex-row justify-center items-center lg:items-start gap-5 lg:gap-[22px] px-2.5 pt-[30px] pb-[40px] max-w-7xl mx-auto">
-              {/* Card 1: 2 Bottles */}
-              <div className="order-2 lg:order-1">
-                <PackageCard
-                  pkg={PACKAGES[0]}
-                  onSelect={handleSelectPackage}
-                  isSelected={selectedPackage.id === PACKAGES[0].id}
-                />
-              </div>
+            
+            {/* 1. Hero Section (Matching Image 1) */}
+            <HeroSection onScrollToPricing={() => scrollToSection('pricing')} />
 
-              {/* Card 2: 6 Bottles (Best Offer) */}
-              <div className="order-1 lg:order-2">
-                <PackageCard
-                  pkg={PACKAGES[1]}
-                  onSelect={handleSelectPackage}
-                  isSelected={selectedPackage.id === PACKAGES[1].id}
-                />
-              </div>
+            {/* 2. Official Video Presentation (Anti-Redirect YouTube Embed) */}
+            <VideoSection />
 
-              {/* Card 3: 3 Bottles */}
-              <div className="order-3 lg:order-3">
-                <PackageCard
-                  pkg={PACKAGES[2]}
-                  onSelect={handleSelectPackage}
-                  isSelected={selectedPackage.id === PACKAGES[2].id}
-                />
-              </div>
-            </div>
+            {/* 3. Intro & Inside Every Capsule (Matching Image 2) */}
+            <IntroSection onScrollToPricing={() => scrollToSection('pricing')} />
+
+            {/* 3. Powerful Synergistic Ingredients (Matching Image 3) */}
+            <IngredientsGrid />
+
+            {/* 4. What Happens In Your Body & The SodaSlim Difference (Matching Image 4) */}
+            <BodyImpactSection />
+
+            {/* 5. Medical Review & cGMP Lab Purity (Matching Image 5) */}
+            <DoctorAndLabSection />
+
+            {/* 6. What To Expect Week-by-Week (Matching Image 6) */}
+            <JourneySection onScrollToPricing={() => scrollToSection('pricing')} />
+
+            {/* 7. Real Customer Experiences & Mid-Page CTA (Matching Image 7) */}
+            <TestimonialsSection onScrollToPricing={() => scrollToSection('pricing')} />
+
+            {/* 8. Explore Offers Section (Redirects directly to Affiliate Link) */}
+            <ExploreOffersSection />
+
+            {/* 9. 60-Day 100% Money-Back Guarantee (Matching Image 9) */}
+            <GuaranteeCard onScrollToPricing={() => scrollToSection('pricing')} />
+
+            {/* 10. Scientific References & Publisher Badges (Matching Image 10) */}
+            <ScientificReferencesSection />
+
+            {/* 11. Frequently Asked Questions Accordion (Matching Image 11) */}
+            <FaqSection />
+
           </div>
         )}
 
@@ -192,6 +258,53 @@ export default function App() {
           </div>
         )}
       </main>
+
+      {/* Sticky Bottom Bar for quick conversions on scroll */}
+      {currentStep === 1 && showStickyBar && (
+        <div className="fixed bottom-0 inset-x-0 z-30 bg-[#0f233d]/95 backdrop-blur-md border-t border-amber-500/30 p-2.5 sm:py-3 sm:px-6 shadow-2xl flex items-center justify-between gap-2 sm:gap-4 animate-fadeIn">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <span className="hidden sm:inline-flex text-[11px] font-black uppercase px-2 py-0.5 rounded bg-amber-400 text-slate-950 shrink-0">
+              BEST OFFER
+            </span>
+            <div className="text-left text-[11.5px] sm:text-xs md:text-sm truncate">
+              <span className="font-extrabold text-white">
+                SodaSlim (6 Bottles):
+              </span>{' '}
+              <span className="text-amber-300 font-black">$49 / bottle</span>{' '}
+              <span className="text-slate-300 hidden md:inline">
+                + Free Shipping &amp; 60-Day Guarantee
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const AFFILIATE_URL = 'https://sodaslim.com/sds-aff-buy-dtc/?aff_id=245174';
+              recordClick('Sticky Bottom Bar -> Affiliate Link', 'cta');
+              const win = window as unknown as { gtag_report_conversion?: (url?: string) => boolean };
+              if (typeof win.gtag_report_conversion === 'function') {
+                win.gtag_report_conversion(AFFILIATE_URL);
+              } else {
+                try {
+                  if (window.top && window.top !== window) {
+                    window.top.location.href = AFFILIATE_URL;
+                  } else {
+                    window.location.href = AFFILIATE_URL;
+                  }
+                } catch {
+                  window.location.href = AFFILIATE_URL;
+                }
+              }
+            }}
+            className="btn-gold h-9 px-3.5 sm:h-10 sm:px-6 rounded-lg font-black text-xs sm:text-sm text-slate-950 uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition shrink-0 cursor-pointer whitespace-nowrap"
+          >
+            Claim Discount
+          </button>
+        </div>
+      )}
+
+      {/* Official Sales Page Footer (Matching Image 12) */}
+      <SalesFooter />
 
       {/* Cookie Consent & Affiliate Redirect Modal */}
       <CookieBanner />

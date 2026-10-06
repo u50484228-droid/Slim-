@@ -1,10 +1,10 @@
 import React from 'react';
-import singleBottleImg from '../assets/images/sodaslim_single_bottle_1791075818032.jpg';
+import singleBottleImg from '../assets/images/sodaslim_full_orange_bottle_1791276223752.jpg';
 import twoBottlesImg from '../assets/images/sodaslim_two_bottles_1791075788952.jpg';
 import threeBottlesImg from '../assets/images/sodaslim_three_bottles_1791075809285.jpg';
-import sixBottlesImg from '../assets/images/sodaslim_six_bottles_1791075798293.jpg';
+import sixBottlesImg from '../assets/images/sodaslim_six_dark_bg_1791276463709.jpg';
 
-// Exact original high-definition SodaSlim bottle assets requested by user
+// Exact SodaSlim bottle assets with 100% full vibrant orange/amber label requested by user
 export const BOTTLE_IMAGES = {
   single: singleBottleImg,
   two: twoBottlesImg,
